@@ -1,0 +1,141 @@
+﻿@page "/RegistroPersonas"
+
+@using RepasoExamenControllers.Models;
+@using RepasoExamenControllers.Controllers;
+
+    <div class="container">
+        <h3 class="display-4 text-center">Registro de Personas</h3>
+
+        <EditForm Model="Persona" OnValidSubmit="Guardar">
+
+            <div class="form-group">
+                <label>Id</label>
+                <InputNumber @bind-Value="@Persona.PersonaId" class="form-control"></InputNumber>
+                <button class="btn btn-outline-primary mt-2" type="button" @onclick="Buscar">Buscar</button>
+            </div>
+            <div class="form-group">
+                <label>Nombres</label>
+                <InputText @bind-Value="@Persona.Nombres" class="form-control"></InputText>
+            </div>
+            <div class="form-group">
+                <label>Fecha de Nacimiento</label>
+                <InputDate @bind-Value="@Persona.FechaNacimiento" class="form-control"></InputDate>
+            </div>
+            <small class="text-muted">@Mensaje</small>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button class="btn btn-primary" type="button" @onclick="Limpiar">Limpiar</button>
+                <button class="btn btn-danger" type="button" @onclick="Eliminar">Eliminar</button>
+            </div>
+
+
+        </EditForm>
+
+    </div>
+
+
+@code {    
+
+    public Personas Persona { get; set; }
+    public string Mensaje { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        Persona = new Personas();
+        Mensaje = string.Empty;
+    }
+
+    private void Guardar()
+    {
+        PersonasController db = new PersonasController();
+
+        try
+        {
+            if(Persona.PersonaId == 0)
+            {
+                if(db.Guardar(Persona))
+                {
+                    Persona = new Personas();
+                    Mensaje = "Guardado correctamente";
+                }else
+                {
+                    Mensaje = "No se pudo guardar";
+                }
+            }
+            else
+            {
+                if(db.Modificar(Persona))
+                {
+                    Persona = new Personas();
+                    Mensaje = "Modificado correctamente";
+                }else
+                {
+                    Mensaje = "No se pudo modificar";
+                }
+            }
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    private void Buscar()
+    {
+        PersonasController db = new PersonasController();
+
+        try
+        {
+            Personas personaTemporal = null;
+            personaTemporal = db.Buscar(Persona.PersonaId);
+
+            if(personaTemporal != null)
+            {
+                Persona = personaTemporal;
+            }
+            else
+            {
+                Mensaje = "No se pudo encontrar";
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    private void Eliminar()
+    {
+        PersonasController db = new PersonasController();
+
+        try
+        {
+            if(db.Eliminar(Persona.PersonaId))
+            {
+                Mensaje = "Eliminado Correctamente";
+                Persona = new Personas();
+            }else
+            {
+                Mensaje = "No se pudo eliminar";
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+    }
+
+    private void Limpiar()
+    {
+        Persona = new Personas();
+        Mensaje = string.Empty;
+    }
+
+
+}
